@@ -22,7 +22,7 @@ https://github.com/electricessence/PerformanceExperiments/blob/master/Performanc
 |    SpanCharTrimLenN | 16.544 ns | 0.2941 ns | 0.2751 ns |      - |         - |
 
 
-### Case Sensitive (`StringTrimToLowerTests`)
+### Case Insensitive
 
 https://github.com/electricessence/PerformanceExperiments/blob/master/PerformanceExperiments/StringTrimToLowerTests.cs
 
