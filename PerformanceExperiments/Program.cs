@@ -5,9 +5,9 @@ namespace PerformanceExperiments
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static void Main()
 		{
-			BenchmarkRunner.Run<StringTrimTests>();
+			BenchmarkRunner.Run<StringTrimToLowerTests>();
 		}
 	}
 }
