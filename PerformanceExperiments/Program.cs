@@ -7,7 +7,7 @@ namespace PerformanceExperiments
 	{
 		static void Main()
 		{
-			BenchmarkRunner.Run<StringTrimToLowerTests>();
+			BenchmarkRunner.Run<BitwiseVsShortCircuit>();
 		}
 	}
 }
