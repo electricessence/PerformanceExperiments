@@ -67,7 +67,6 @@ namespace PerformanceExperiments
 		[Benchmark]
 		public bool SpanCharTrimLenY2()
 		{
-
 			var t = _yx__.AsSpan().Trim();
 			return t.Length == 1 && MemoryExtensions.Equals(t, y, StringComparison.Ordinal);
 		}
