@@ -14,6 +14,19 @@ namespace PerformanceExperiments
 		[Benchmark]
 		public bool StringTrim() => _y__.Trim() == y;
 
+		[Benchmark]
+		public bool StringTrimCompare() => _y__.Trim().Equals(y, StringComparison.Ordinal);
+
+		[Benchmark]
+		public bool StringTrimCompareFalse() => _y__.Trim().Equals(_n__, StringComparison.Ordinal);
+
+		[Benchmark]
+		public bool StringTrimCompareLenFalse()
+		{
+			var t = _y__.Trim();
+			var len = t.Length;
+			return len == _n__.Length && t.Equals(_n__, StringComparison.Ordinal);
+		}
 
 		[Benchmark]
 		public bool StringTrimLenChar()
@@ -48,6 +61,28 @@ namespace PerformanceExperiments
 
 		[Benchmark]
 		public bool SpanCharTrim() => MemoryExtensions.Equals(_y__.AsSpan().Trim(), y, StringComparison.Ordinal);
+
+
+		[Benchmark]
+		public bool SpanCharTrimFalse() => MemoryExtensions.Equals(_y__.AsSpan().Trim(), _n__, StringComparison.Ordinal);
+
+
+		[Benchmark]
+		public bool SpanCharTrimLenFalse()
+		{
+			var t = _y__.AsSpan().Trim();
+			var len = t.Length;
+			return len == _n__.Length && MemoryExtensions.Equals(t, _n__, StringComparison.Ordinal);
+		}
+
+		[Benchmark]
+		public bool SpanCharTrimSpanLenFalse()
+		{
+			var t = _y__.AsSpan().Trim();
+			var t2 = _n__.AsSpan();
+			var len = t.Length;
+			return len == t2.Length && MemoryExtensions.Equals(t, t2, StringComparison.Ordinal);
+		}
 
 
 		[Benchmark]

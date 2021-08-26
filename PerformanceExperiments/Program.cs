@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Running;
-using System;
 
 namespace PerformanceExperiments
 {
@@ -7,7 +6,7 @@ namespace PerformanceExperiments
 	{
 		static void Main()
 		{
-			BenchmarkRunner.Run<BitwiseVsShortCircuit>();
+			BenchmarkRunner.Run<StringTrimToLowerTests>();
 		}
 	}
 }
