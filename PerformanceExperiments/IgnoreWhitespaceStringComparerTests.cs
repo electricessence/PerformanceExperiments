@@ -1,4 +1,5 @@
-﻿using Sylvan;
+﻿using BenchmarkDotNet.Attributes;
+using Sylvan;
 using System;
 using System.Collections.Generic;
 
@@ -21,6 +22,7 @@ namespace PerformanceExperiments
 			}
 		}
 
+		[Benchmark]
 		public override bool Equals() => Comparer.Equals(A, B);
 	}
 }

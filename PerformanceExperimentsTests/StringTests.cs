@@ -14,21 +14,19 @@ namespace PerformanceExperimentsTests
 		[InlineData("Abc", "aBC", StringComparison.OrdinalIgnoreCase)]
 		public void EqualityTest(string a, string b = null, StringComparison sc = StringComparison.Ordinal)
 		{
-			var test = new PerformanceExperiments.StringTests
+			AllTrue(new PerformanceExperiments.StringTests
 			{
 				A = a,
 				B = b ?? a,
 				Comparison = sc
-			};
-			AllTrue(test);
+			});
 
-			test = new PerformanceExperiments.SpanTests
+			AllTrue(new PerformanceExperiments.SpanTests
 			{
 				A = a,
 				B = b ?? a,
 				Comparison = sc
-			};
-			AllTrue(test);
+			});
 
 			var custom = new PerformanceExperiments.IgnoreWhitespaceStringComparerTests
 			{
@@ -39,7 +37,7 @@ namespace PerformanceExperimentsTests
 			Assert.True(custom.Equals());
 		}
 
-		static void AllTrue(PerformanceExperiments.StringTests t)
+		static void AllTrue(PerformanceExperiments.StringTestsBase t)
 		{
 			Assert.True(t.Equals());
 			Assert.True(t.EqualsWithLen());
