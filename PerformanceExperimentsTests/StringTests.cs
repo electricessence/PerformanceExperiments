@@ -12,24 +12,30 @@ namespace PerformanceExperimentsTests
 		[InlineData("ABC")]
 
 		[InlineData("Abc", "aBC", StringComparison.OrdinalIgnoreCase)]
-		public void EqualityTest(string a, string? b = null, System.StringComparison sc = System.StringComparison.Ordinal)
+		public void EqualityTest(string a, string b = null, StringComparison sc = StringComparison.Ordinal)
 		{
-			var test = new PerformanceExperiments.StringTests();
-			test.A = a;
-			test.B = b ?? a;
-			test.Comparison = sc;
+			var test = new PerformanceExperiments.StringTests
+			{
+				A = a,
+				B = b ?? a,
+				Comparison = sc
+			};
 			AllTrue(test);
 
-			test = new PerformanceExperiments.SpanTests();
-			test.A = a;
-			test.B = b ?? a;
-			test.Comparison = sc;
+			test = new PerformanceExperiments.SpanTests
+			{
+				A = a,
+				B = b ?? a,
+				Comparison = sc
+			};
 			AllTrue(test);
 
-			var custom = new PerformanceExperiments.IgnoreWhitespaceStringComparerTests();
-			custom.A = a;
-			custom.B = b ?? a;
-			custom.Comparison = sc;
+			var custom = new PerformanceExperiments.IgnoreWhitespaceStringComparerTests
+			{
+				A = a,
+				B = b ?? a,
+				Comparison = sc
+			};
 			Assert.True(custom.Equals());
 		}
 
