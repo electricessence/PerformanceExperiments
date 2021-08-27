@@ -10,7 +10,8 @@ namespace PerformanceExperiments
 
 		IEqualityComparer<string> Comparer = IgnoreWhitespaceStringComparer.Instance;
 
-		public override StringComparison Comparison {
+		public override StringComparison Comparison
+		{
 			get => base.Comparison;
 			set
 			{

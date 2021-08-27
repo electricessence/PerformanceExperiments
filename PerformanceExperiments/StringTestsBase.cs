@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using System;
 
 namespace PerformanceExperiments
 {
@@ -8,7 +7,7 @@ namespace PerformanceExperiments
 	{
 		public override bool Equals() => A.Equals(B, Comparison);
 
-		public virtual bool EqualsWithLen() => A.Length==B.Length && A.Equals(B, Comparison);
+		public virtual bool EqualsWithLen() => A.Length == B.Length && A.Equals(B, Comparison);
 
 		public virtual bool TrimEqualityA() => A.Trim().Equals(B, Comparison);
 
@@ -17,7 +16,7 @@ namespace PerformanceExperiments
 		public virtual bool TrimEqualityWithLenA()
 		{
 			var t = A.Trim();
-			return t.Length==B.Length && t.Equals(B, Comparison);
+			return t.Length == B.Length && t.Equals(B, Comparison);
 		}
 
 		public virtual bool TrimEqualityWithLenAB()
