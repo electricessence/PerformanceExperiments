@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using Sylvan;
 using System;
 
 namespace PerformanceExperiments
@@ -12,14 +13,22 @@ namespace PerformanceExperiments
 		const string _yx__ = " Yx  ";
 
 		[Benchmark]
-		public bool StringTrim() => _y__.Trim().ToLower() == y;
-
+		public bool StringTrim()
+		{
+			return _y__.Trim().ToLower() == y;
+		}
 
 		[Benchmark]
-		public bool StringTrimCompare() => _y__.Trim().Equals(y, StringComparison.OrdinalIgnoreCase);
+		public bool StringTrimCompare()
+		{
+			return _y__.Trim().Equals(y, StringComparison.OrdinalIgnoreCase);
+		}
 
 		[Benchmark]
-		public bool StringTrimCompareFalse() => _y__.Trim().Equals(_n__, StringComparison.OrdinalIgnoreCase);
+		public bool StringTrimCompareFalse()
+		{
+			return _y__.Trim().Equals(_n__, StringComparison.OrdinalIgnoreCase);
+		}
 
 		[Benchmark]
 		public bool StringTrimCompareLenFalse()
@@ -58,14 +67,41 @@ namespace PerformanceExperiments
 			return t.Length == 1 && t == y;
 		}
 
-
+		[Benchmark]
+		public bool CustomStringTrimCompareFalse()
+		{
+			return IgnoreWhitespaceStringComparer.IgnoreCase.Equals(_y__, _n__);
+		}
 
 		[Benchmark]
-		public bool SpanCharTrim() => MemoryExtensions.Equals(_y__.AsSpan().Trim(), y, StringComparison.OrdinalIgnoreCase);
+		public bool CustomStringTrimLenY1()
+		{
+			return IgnoreWhitespaceStringComparer.IgnoreCase.Equals(_y__, y);
+		}
 
 		[Benchmark]
-		public bool SpanCharTrimFalse() => MemoryExtensions.Equals(_y__.AsSpan().Trim(), _n__, StringComparison.OrdinalIgnoreCase);
+		public bool CustomStringTrimLenY2()
+		{
+			return IgnoreWhitespaceStringComparer.IgnoreCase.Equals(_yx__, y);
+		}
 
+		[Benchmark]
+		public bool CustomStringTrimLenN()
+		{
+			return IgnoreWhitespaceStringComparer.IgnoreCase.Equals(_n__, y);
+		}
+
+		[Benchmark]
+		public bool SpanCharTrim()
+		{
+			return MemoryExtensions.Equals(_y__.AsSpan().Trim(), y, StringComparison.OrdinalIgnoreCase);
+		}
+
+		[Benchmark]
+		public bool SpanCharTrimFalse()
+		{
+			return MemoryExtensions.Equals(_y__.AsSpan().Trim(), _n__, StringComparison.OrdinalIgnoreCase);
+		}
 
 		[Benchmark]
 		public bool SpanCharTrimLenFalse()
@@ -90,7 +126,7 @@ namespace PerformanceExperiments
 			var t = _y__.AsSpan().Trim();
 			if (t.Length != 1) return false;
 			ref readonly var f = ref t[0];
-			return f=='y' || f=='Y';
+			return f == 'y' || f == 'Y';
 		}
 
 		[Benchmark]

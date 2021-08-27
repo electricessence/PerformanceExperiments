@@ -6,6 +6,7 @@ namespace PerformanceExperiments
 	{
 		static void Main()
 		{
+			BenchmarkRunner.Run<StringTrimTests>();
 			BenchmarkRunner.Run<StringTrimToLowerTests>();
 		}
 	}
