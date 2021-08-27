@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Sylvan
 {
-	public sealed class IgnoreWhitespaceStringComparer : IEqualityComparer<string>
+	public sealed class IgnoreWhitespaceStringComparer : IEqualityComparer<string?>
 	{
-		public static readonly IEqualityComparer<string> Instance = new IgnoreWhitespaceStringComparer(0);
-		public static readonly IEqualityComparer<string> IgnoreCase = new IgnoreWhitespaceStringComparer(0x20);
+		public static readonly IEqualityComparer<string?> Instance = new IgnoreWhitespaceStringComparer(0);
+		public static readonly IEqualityComparer<string?> IgnoreCase = new IgnoreWhitespaceStringComparer(0x20);
 
 		private IgnoreWhitespaceStringComparer(int caseMask)
 		{
@@ -15,15 +15,15 @@ namespace Sylvan
 
 		readonly int caseMask;
 
-		public bool Equals(string x, string y)
+		public bool Equals(string? x, string? y)
 		{
-			if (x == null)
+			if (x is null)
 			{
-				return y == null;
+				return y is null;
 			}
 			else
 			{
-				if (y == null)
+				if (y is null)
 					return false;
 			}
 
@@ -65,7 +65,7 @@ namespace Sylvan
 
 		public int GetHashCode(string obj)
 		{
-			if (obj == null) return 0;
+			if (obj is null) return 0;
 
 			var hc = new HashCode();
 			for (int i = 0; i < obj.Length; i++)

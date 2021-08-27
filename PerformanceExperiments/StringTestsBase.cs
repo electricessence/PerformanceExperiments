@@ -7,7 +7,7 @@ namespace PerformanceExperiments
 	{
 		public override bool Equals() => A.Equals(B, Comparison);
 
-		public virtual bool EqualsWithLen() => A.Length == B.Length && A.Equals(B, Comparison);
+		public virtual bool EqualsWithLen() => B is not null && A.Length == B.Length && A.Equals(B, Comparison);
 
 		public virtual bool TrimEqualityA() => A.Trim().Equals(B, Comparison);
 
