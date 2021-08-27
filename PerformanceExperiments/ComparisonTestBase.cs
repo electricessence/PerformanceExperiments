@@ -26,7 +26,7 @@ namespace PerformanceExperiments
 		public virtual StringComparison Comparison { get; set; }
 
 		[Params("", _y__, _n__, _yx__, Hello_World, Hello_world, Fox1, Fox2)]
-		public string A { get; set; }
+		public string A { get; set; } = string.Empty;
 
 		[Params(null, "", y, _y__, _n__, _yx__, _Y__, _N__, _Yx__, Hello_World, Hello_world, Hello_World_, Hello_world_, Fox1, Fox2, Fox3, Fox4)]
 		public string? B { get; set; }
