@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
-using System;
 using Sylvan;
+using System;
 
 namespace PerformanceExperiments
 {
