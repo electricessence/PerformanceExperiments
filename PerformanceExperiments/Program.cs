@@ -6,8 +6,8 @@ namespace PerformanceExperiments
 	{
 		static void Main()
 		{
-			//BenchmarkRunner.Run<StringTests>();
-			//BenchmarkRunner.Run<SpanTests>();
+			BenchmarkRunner.Run<StringTests>();
+			BenchmarkRunner.Run<SpanTests>();
 			BenchmarkRunner.Run<IgnoreWhitespaceStringComparerTests>();
 		}
 	}
