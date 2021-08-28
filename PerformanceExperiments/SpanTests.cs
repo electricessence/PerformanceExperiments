@@ -6,18 +6,18 @@ namespace PerformanceExperiments
 	public class SpanTests : StringTestsBase
 	{
 		[Benchmark]
-		public override bool Equals() => A.AsSpan().Equals(B.AsSpan(), Comparison);
+		public override bool Equals() => B is not null && A.AsSpan().Equals(B.AsSpan(), Comparison);
 
 		[Benchmark]
 		public override bool EqualsWithLen() => A.AsSpan().Equals(B, Comparison);
 
 
 		[Benchmark]
-		public override bool TrimEqualityA() => A.AsSpan().Trim().Equals(B.AsSpan(), Comparison);
+		public override bool TrimEqualityA() => B is not null && A.AsSpan().Trim().Equals(B.AsSpan(), Comparison);
 
 
 		[Benchmark]
-		public override bool TrimEqualityAB() => A.AsSpan().Trim().Equals(B.AsSpan().Trim(), Comparison);
+		public override bool TrimEqualityAB() => B is not null && A.AsSpan().Trim().Equals(B.AsSpan().Trim(), Comparison);
 
 
 		[Benchmark]
@@ -27,6 +27,7 @@ namespace PerformanceExperiments
 		[Benchmark]
 		public override bool TrimEqualityWithLenAB()
 		{
+			if (B is null) return false;
 			var tA = A.AsSpan().Trim();
 			var tB = B.AsSpan().Trim();
 			return tA.Length == tB.Length && tA.Equals(tB, Comparison);
