@@ -49,15 +49,19 @@ namespace PerformanceExperiments
 		}
 
 		[Benchmark]
-		public void Equals() => Test(Standard);
+		public void Equals_WithNulls() => Test(Standard);
 
+		[Benchmark]
+		public void EqualsWithLengthTestFirst_WithNulls() => Test(WithLengthFirst);
 
 
 		[Benchmark]
-		public void EqualsWithLengthTestFirst() => Test(WithLengthFirst);
-
+		public void Equals_NoNulls() => Test2(Standard);
 
 		[Benchmark]
-		public void EqualsWithLengthTestFirstNoNull() => Test2(WithLengthFirst);
+		public void EqualsWithLengthTestFirst_NoNulls() => Test2(WithLengthFirst);
+
+		[Benchmark]
+		public void EqualsWithLengthTestFirstNoNullCheck() => Test2(WithLengthFirstNoNull);
 	}
 }
