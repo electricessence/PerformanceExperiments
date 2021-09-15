@@ -9,7 +9,8 @@ namespace PerformanceExperiments
 			//BenchmarkRunner.Run<StringTests>();
 			//BenchmarkRunner.Run<SpanTests>();
 			//BenchmarkRunner.Run<IgnoreWhitespaceStringComparerTests>();
-			BenchmarkRunner.Run<StringEqualsTests>();
+			//BenchmarkRunner.Run<StringEqualsTests>();
+			BenchmarkRunner.Run<SimpleStringEqualsTests>();
 		}
 	}
 }
