@@ -20,8 +20,8 @@ namespace PerformanceExperiments
 		public bool IgnoreCase { get; set; }
 
 
-		readonly string[] ValidValues = new string[] { "Alpha", "Epislon", "Phi" };
-		readonly string[] InvalidValues = new string[] { "Apple", "Orange", "Pineapple" };
+		static readonly string[] ValidValues = new string[] { Greek.Alpha.ToString(), Greek.Epsilon.ToString(), Greek.Phi.ToString() };
+		static readonly string[] InvalidValues = new string[] { "Apple", "Orange", "Pineapple" };
 
 		[Benchmark(Baseline = true)]
 		public Greek EnumParse()
