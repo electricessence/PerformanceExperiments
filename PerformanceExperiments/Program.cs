@@ -11,7 +11,8 @@ namespace PerformanceExperiments
 			//BenchmarkRunner.Run<IgnoreWhitespaceStringComparerTests>();
 			//BenchmarkRunner.Run<StringEqualsTests>();
 			//BenchmarkRunner.Run<SimpleStringEqualsTests>();
-			BenchmarkRunner.Run<SwitchTests>();
+			//BenchmarkRunner.Run<SwitchTests>();
+			BenchmarkRunner.Run<EnumParseTests>();
 		}
 	}
 }

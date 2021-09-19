@@ -35,7 +35,7 @@ namespace PerformanceExperiments
 		[Benchmark]
 		public bool IsEmptyStringRefEqualLength()
 		{
-			return Object.ReferenceEquals(Empty, null) & Empty!.Length == 0 & Object.ReferenceEquals(Space, null) & Space!.Length == 0;
+			return ReferenceEquals(Empty, null) & Empty!.Length == 0 & ReferenceEquals(Space, null) & Space!.Length == 0;
 		}
 
 		[Benchmark]
