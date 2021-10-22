@@ -12,7 +12,8 @@ namespace PerformanceExperiments
 			//BenchmarkRunner.Run<StringEqualsTests>();
 			//BenchmarkRunner.Run<SimpleStringEqualsTests>();
 			//BenchmarkRunner.Run<SwitchTests>();
-			BenchmarkRunner.Run<EnumParseTests>();
+			//BenchmarkRunner.Run<EnumParseTests>();
+			BenchmarkRunner.Run<TypeofVsIs>();
 		}
 	}
 }
