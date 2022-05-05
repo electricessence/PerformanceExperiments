@@ -11,7 +11,7 @@ namespace PerformanceExperiments
 		/// <param name="other">The string to compare to.</param>
 		/// <param name="stringComparison">The string comparison type.</param>
 		/// <returns>True if the are contents equal.</returns>
-		public static bool Equals(this in ReadOnlySpan<char> source, string? other, StringComparison stringComparison)
+		public static bool Equals(this ReadOnlySpan<char> source, string? other, StringComparison stringComparison)
 		{
 			if (other is null) return false;
 			var len = source.Length;
@@ -29,7 +29,7 @@ namespace PerformanceExperiments
 		/// <param name="other">The string to compare to.</param>
 		/// <param name="stringComparison">The string comparison type.</param>
 		/// <returns>True if the are contents equal.</returns>
-		public static bool Equals(this in Span<char> source, string? other, StringComparison stringComparison)
+		public static bool Equals(this Span<char> source, string? other, StringComparison stringComparison)
 		{
 			if (other is null) return false;
 			var len = source.Length;
@@ -47,7 +47,7 @@ namespace PerformanceExperiments
 		/// <param name="other">The span to compare to.</param>
 		/// <param name="stringComparison">The string comparison type.</param>
 		/// <returns>True if the are contents equal.</returns>
-		public static bool Equals(this in Span<char> source, in Span<char> other, StringComparison stringComparison)
+		public static bool Equals(this Span<char> source, Span<char> other, StringComparison stringComparison)
 		{
 			var len = source.Length;
 			if (len != other.Length) return false;
@@ -64,7 +64,7 @@ namespace PerformanceExperiments
 		/// <param name="other">The span to compare to.</param>
 		/// <param name="stringComparison">The string comparison type.</param>
 		/// <returns>True if the are contents equal.</returns>
-		public static bool Equals(this in Span<char> source, in ReadOnlySpan<char> other, StringComparison stringComparison)
+		public static bool Equals(this Span<char> source, ReadOnlySpan<char> other, StringComparison stringComparison)
 		{
 			var len = source.Length;
 			if (len != other.Length) return false;
@@ -81,7 +81,7 @@ namespace PerformanceExperiments
 		/// <param name="other">The span to compare to.</param>
 		/// <param name="stringComparison">The string comparison type.</param>
 		/// <returns>True if the are contents equal.</returns>
-		public static bool Equals(this string source, in ReadOnlySpan<char> other, StringComparison stringComparison)
+		public static bool Equals(this string source, ReadOnlySpan<char> other, StringComparison stringComparison)
 		{
 			if (source is null) throw new ArgumentNullException(nameof(source));
 			var len = source.Length;
@@ -99,7 +99,7 @@ namespace PerformanceExperiments
 		/// <param name="other">The span to compare to.</param>
 		/// <param name="stringComparison">The string comparison type.</param>
 		/// <returns>True if the are contents equal.</returns>
-		public static bool Equals(this string source, in Span<char> other, StringComparison stringComparison)
+		public static bool Equals(this string source, Span<char> other, StringComparison stringComparison)
 		{
 			if (source is null) throw new ArgumentNullException(nameof(source));
 			var len = source.Length;
