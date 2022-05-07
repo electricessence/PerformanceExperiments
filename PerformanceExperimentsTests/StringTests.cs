@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace PerformanceExperimentsTests
+namespace PerformanceExperiments.Tests
 {
 
 	public class StringTests

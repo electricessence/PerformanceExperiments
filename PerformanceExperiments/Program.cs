@@ -6,7 +6,7 @@ namespace PerformanceExperiments
 	{
 		static void Main()
 		{
-			BenchmarkRunner.Run<TryParseTest>();
+			BenchmarkRunner.Run<HasDigitBenchmarks>();
 			//BenchmarkRunner.Run<StringTests>();
 			//BenchmarkRunner.Run<SpanTests>();
 			//BenchmarkRunner.Run<IgnoreWhitespaceStringComparerTests>();
