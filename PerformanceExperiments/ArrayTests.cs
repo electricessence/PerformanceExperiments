@@ -3,7 +3,6 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace PerformanceExperiments;
@@ -29,16 +28,16 @@ public class ArrayTests
 		return x;
 	}
 
-	[Benchmark]
-	public int ArrayReadOnlyRead()
-	{
-		int x = -1;
-		for (var i = 0; i < Size; i++)
-		{
-			x = ValuesReadOnly[i];
-		}
-		return x;
-	}
+	//[Benchmark]
+	//public int ArrayReadOnlyRead()
+	//{
+	//	int x = -1;
+	//	for (var i = 0; i < Size; i++)
+	//	{
+	//		x = ValuesReadOnly[i];
+	//	}
+	//	return x;
+	//}
 
 	[Benchmark]
 	public int MemoryRead()
@@ -59,6 +58,29 @@ public class ArrayTests
 		for (var i = 0; i < Size; i++)
 		{
 			x = ValuesImmutable[i];
+		}
+		return x;
+	}
+
+	[Benchmark]
+	public int ImmutableReadRef()
+	{
+		var x = ValuesImmutable.ItemRef(0);
+		for (var i = 1; i < Size; i++)
+		{
+			 x = ValuesImmutable.ItemRef(i);
+		}
+		return x;
+	}
+
+	[Benchmark]
+	public int ImmutableReadSpan()
+	{
+		int x = -1;
+		var span = ValuesImmutable.AsSpan();
+		for (var i = 0; i < Size; i++)
+		{
+			x = span[i];
 		}
 		return x;
 	}

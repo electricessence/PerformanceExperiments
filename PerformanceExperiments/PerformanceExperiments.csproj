@@ -17,6 +17,7 @@
     <PackageReference Include="Open.Diagnostics" Version="1.4.1" />
     <PackageReference Include="Open.RandomizationExtensions" Version="2.5.3" />
     <PackageReference Include="Open.Text" Version="6.3.0" />
+    <PackageReference Include="System.IO.Pipelines" Version="7.0.0" />
   </ItemGroup>
 
 </Project>

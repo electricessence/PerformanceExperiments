@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Running;
 using PerformanceExperiments;
 
-BenchmarkRunner.Run<ArrayTests>();
+//BenchmarkRunner.Run<ArrayTests>();
 //BenchmarkRunner.Run<HasDigitBenchmarks>();
 //BenchmarkRunner.Run<StringTests>();
 //BenchmarkRunner.Run<SpanTests>();
@@ -13,3 +13,4 @@ BenchmarkRunner.Run<ArrayTests>();
 //BenchmarkRunner.Run<TypeofVsIs>();
 //BenchmarkRunner.Run<DictionaryTests>();
 //DictionaryTests.TestAll();
+BenchmarkRunner.Run<BinarySearchCrossover>();
