@@ -13,4 +13,5 @@ using PerformanceExperiments;
 //BenchmarkRunner.Run<TypeofVsIs>();
 //BenchmarkRunner.Run<DictionaryTests>();
 //DictionaryTests.TestAll();
-BenchmarkRunner.Run<BinarySearchCrossover>();
+//BenchmarkRunner.Run<BinarySearchCrossover>();
+BenchmarkRunner.Run<EnumToStringDTests>();
