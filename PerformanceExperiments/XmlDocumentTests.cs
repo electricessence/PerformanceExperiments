@@ -1,8 +1,14 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.CoreRun;
+using PerformanceExperiments;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.XPath;
 
 namespace PerformanceExperiments;
@@ -19,7 +25,9 @@ public static class XmlDocumentExtensions
 {
 	public static IEnumerable<XmlNode> GetDescendants(this XmlNode node, bool includeSelf = false)
 	{
-		XmlNode? current = includeSelf ? node : node.FirstChild;
+		if (includeSelf) yield return node;
+
+		XmlNode? current = node.FirstChild;
 		if(current is null) yield break;
 
 	start: // Using a label to avoid unnecessary while condition check.
@@ -29,8 +37,11 @@ public static class XmlDocumentExtensions
 		if(next is null)
 		{
 		findNext: // Again, using a label avoids an unnecessary null check.
-			var parent = current!.ParentNode;
-			if(parent is null || parent == node)
+			var parent = current!.ParentNode!;
+			// 'parent' should never be null as we should have come full circle.
+			// Unless the tree was modified, but that would cause more than just a null reference problem.
+			Debug.Assert(parent is not null);
+			if(parent == node)
 				yield break;
 
 			next = parent.NextSibling;
@@ -89,7 +100,36 @@ public static class XmlDocumentExtensions
 				&& n.NodeType == XmlNodeType.Element
 				&& n[childName]?.FirstChild?.Value == childValue)
 			.Cast<XmlElement>();
+
+	public static IEnumerable<XmlNode> GetChildren(this XmlNode node)
+	{
+		XmlNode? childNode = node.FirstChild;
+		while (childNode is not null)
+		{
+			yield return childNode;
+			childNode = childNode.NextSibling;
+		}
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static IEnumerable<XmlNode> GetChildrenAggressiveInlining(this XmlNode node)
+	{
+		XmlNode? childNode = node.FirstChild;
+		while (childNode is not null)
+		{
+			yield return childNode;
+			childNode = childNode.NextSibling;
+		}
+	}
 }
+
+/*
+|                Method |     Mean |    Error |   StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
+|---------------------- |---------:|---------:|---------:|------:|--------:|-------:|----------:|------------:|
+|            ChildNodes | 89.78 ns | 0.898 ns | 0.796 ns |  1.00 |    0.00 | 0.0305 |      64 B |        1.00 |
+|           NextSibling | 77.25 ns | 1.163 ns | 1.088 ns |  0.86 |    0.02 | 0.0267 |      56 B |        0.88 |
+| NextSiblingAggressive | 76.15 ns | 1.240 ns | 1.612 ns |  0.85 |    0.02 | 0.0267 |      56 B |        0.88 |
+*/
 
 [MemoryDiagnoser]
 public class XmlDocumentTraversalBenchmarks
@@ -264,4 +304,64 @@ public class XmlDocumentTraversalBenchmarks
 	</root>
 	""";
 
+}
+
+[MemoryDiagnoser]
+public class XmlChildNodesBenchmark
+{
+	private XmlDocument? _xmlDocument;
+	private XmlNode? _parentNode;
+
+	[GlobalSetup]
+	public void Setup()
+	{
+		_xmlDocument = new XmlDocument();
+		_xmlDocument.LoadXml("<root><item/><item/><item/><item/><item/></root>");
+		_parentNode = _xmlDocument.DocumentElement;
+	}
+
+	[Benchmark(Baseline = true)]
+	public string ChildNodes()
+	{
+		var name = string.Empty;
+		foreach (XmlNode childNode in _parentNode!.ChildNodes)
+		{
+			name = childNode.Name;
+		}
+		return name;
+	}
+
+
+	[Benchmark]
+	public string NextSibling()
+	{
+		var name = string.Empty;
+		foreach (XmlNode childNode in _parentNode!.GetChildren())
+		{
+			name = childNode.Name;
+		}
+		return name;
+	}
+
+	[Benchmark]
+	public string NextSiblingAggressive()
+	{
+		var name = string.Empty;
+		foreach (XmlNode childNode in _parentNode!.GetChildrenAggressiveInlining())
+		{
+			name = childNode.Name;
+		}
+		return name;
+	}
+
+	//[Benchmark]
+	//public string NextSiblingToArray()
+	//{
+	//	var name = string.Empty;
+	//	foreach (XmlNode childNode in _parentNode!.GetChildren().ToArray())
+	//	{
+	//		name = childNode.Name;
+	//	}
+	//	return name;
+	//}
 }
