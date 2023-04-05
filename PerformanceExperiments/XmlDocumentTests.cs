@@ -7,39 +7,42 @@ using System.Xml.XPath;
 
 namespace PerformanceExperiments;
 
+/*
+|                  Method |      Mean |     Error |    StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
+|------------------------ |----------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
+|          XPathTraversal | 21.722 us | 0.4197 us | 0.3721 us |  1.00 |    0.00 | 5.2795 |   11080 B |        1.00 |
+|             NodeWalking |  9.133 us | 0.0330 us | 0.0293 us |  0.42 |    0.01 | 0.4120 |     880 B |        0.08 |
+| XPathNavigatorTraversal | 20.854 us | 0.1341 us | 0.1188 us |  0.96 |    0.02 | 4.7913 |   10024 B |        0.90 |
+*/
+
 public static class XmlDocumentExtensions
 {
 	public static IEnumerable<XmlNode> GetDescendants(this XmlNode node, bool includeSelf = false)
 	{
-		XmlNode? current = node;
+		XmlNode? current = includeSelf ? node : node.FirstChild;
+		if(current is null) yield break;
 
-		if (includeSelf)
+	start: // Using a label to avoid unnecessary while condition check.
+		yield return current;
+
+		var next = current.FirstChild ?? current.NextSibling;
+		if(next is null)
 		{
-			yield return current;
+		findNext: // Again, using a label avoids an unnecessary null check.
+			var parent = current!.ParentNode;
+			if(parent is null || parent == node)
+				yield break;
+
+			next = parent.NextSibling;
+			if (next is null)
+			{
+				current = parent;
+				goto findNext;
+			}
 		}
 
-		current = NextNode(current);
-
-		while (current != null)
-		{
-			yield return current;
-			current = NextNode(current);
-		}
-	}
-
-	private static XmlNode? NextNode(XmlNode? node)
-	{
-		if (node!.HasChildNodes)
-		{
-			return node.FirstChild;
-		}
-
-		while (node is not null && node.NextSibling == null)
-		{
-			node = node.ParentNode;
-		}
-
-		return node?.NextSibling;
+		current = next;
+		goto start;
 	}
 
 	public static IEnumerable<XmlElement> GetMatchingDescendants(
