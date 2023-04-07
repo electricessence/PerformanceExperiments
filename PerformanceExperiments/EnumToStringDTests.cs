@@ -42,7 +42,6 @@ public class EnumToStringDTests
 		return s;
 	}
 
-
 	private static string ToIntString<T>(T e)
 		where T : Enum
 	{

@@ -1,14 +1,9 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.CoreRun;
-using PerformanceExperiments;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.XPath;
 
 namespace PerformanceExperiments;
@@ -217,7 +212,6 @@ public class XmlDocumentTraversalBenchmarks
 	//	return results;
 	//}
 
-
 	private static readonly (string, string, string)[] TestParameters = new[]
 	{
 		("department", "name", "HR"),
@@ -303,7 +297,6 @@ public class XmlDocumentTraversalBenchmarks
 		</company>
 	</root>
 	""";
-
 }
 
 [MemoryDiagnoser]
@@ -330,7 +323,6 @@ public class XmlChildNodesBenchmark
 		}
 		return name;
 	}
-
 
 	[Benchmark]
 	public string NextSibling()

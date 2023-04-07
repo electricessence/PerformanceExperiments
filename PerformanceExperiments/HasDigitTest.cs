@@ -33,8 +33,6 @@ public class HasDigitBenchmarks
 	static readonly int[] Digits = new int[] { 2, 3, 5, 7, 8 };
 	static readonly char[] CDigits = Digits.Select(d => d.ToString()[0]).ToArray();
 
-
-
 	[Benchmark(Baseline = true)]
 	public void HasDigitFromString()
 	{

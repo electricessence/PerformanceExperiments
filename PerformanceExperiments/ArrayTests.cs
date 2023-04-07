@@ -3,7 +3,6 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
-using System.Collections.ObjectModel;
 
 namespace PerformanceExperiments;
 
@@ -13,7 +12,7 @@ public class ArrayTests
 	const int Size = 200000000;
 
 	static readonly int[] Values = Enumerable.Range(0, Size).ToArray();
-	static readonly ReadOnlyCollection<int> ValuesReadOnly = Array.AsReadOnly(Values);
+	//static readonly ReadOnlyCollection<int> ValuesReadOnly = Array.AsReadOnly(Values);
 	static readonly ReadOnlyMemory<int> ValuesMemory = Values;
 	static readonly ImmutableArray<int> ValuesImmutable = Values.ToImmutableArray();
 
@@ -84,5 +83,4 @@ public class ArrayTests
 		}
 		return x;
 	}
-
 }

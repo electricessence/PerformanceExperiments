@@ -3,97 +3,91 @@ using FastEnumUtility;
 using Open.Text;
 using System;
 
-namespace PerformanceExperiments
+namespace PerformanceExperiments;
+
+public enum Greek
 {
-	public enum Greek
+	Alpha, Beta, Cappa, Delta, Epsilon, Gamma, Omega, Phi, Theta, None
+}
+
+[MemoryDiagnoser]
+public class EnumParseTests
+{
+	[Params(true, false)]
+	public bool UseValid { get; set; }
+
+	[Params(false, true)]
+	public bool IgnoreCase { get; set; }
+
+	static readonly string[] ValidValues = new string[] { nameof(Greek.Alpha), nameof(Greek.Epsilon), nameof(Greek.Phi) };
+	static readonly string[] InvalidValues = new string[] { "Apple", "Orange", "Pineapple" };
+
+	[Benchmark(Baseline = true)]
+	public Greek EnumParse()
 	{
-		Alpha, Beta, Cappa, Delta, Epsilon, Gamma, Omega, Phi, Theta, None
+		Greek e = Greek.None;
+		if(UseValid)
+		{
+			foreach (string s in ValidValues)
+			{
+				if (!Enum.TryParse(s, IgnoreCase, out e))
+					throw new Exception("Invalid.");
+			}
+		}
+		else
+		{
+			foreach (string s in InvalidValues)
+			{
+				if (Enum.TryParse(s, IgnoreCase, out e))
+					throw new Exception("Valid.");
+			}
+		}
+		return e;
 	}
 
-	[MemoryDiagnoser]
-	public class EnumParseTests
+	[Benchmark]
+	public Greek EnumValueParse()
 	{
-		[Params(true, false)]
-		public bool UseValid { get; set; }
-
-		[Params(false, true)]
-		public bool IgnoreCase { get; set; }
-
-
-		static readonly string[] ValidValues = new string[] { Greek.Alpha.ToString(), Greek.Epsilon.ToString(), Greek.Phi.ToString() };
-		static readonly string[] InvalidValues = new string[] { "Apple", "Orange", "Pineapple" };
-
-		[Benchmark(Baseline = true)]
-		public Greek EnumParse()
+		Greek e = Greek.None;
+		if (UseValid)
 		{
-			Greek e = Greek.None;
-			if(UseValid)
+			foreach (string s in ValidValues)
 			{
-				foreach (string s in ValidValues)
-				{
-					if (!Enum.TryParse(s, IgnoreCase, out e))
-						throw new Exception("Invalid.");
-				}
+				if (!EnumValue.TryParse(s, IgnoreCase, out e))
+					throw new Exception("Invalid.");
 			}
-			else
-			{
-				foreach (string s in InvalidValues)
-				{
-					if (Enum.TryParse(s, IgnoreCase, out e))
-						throw new Exception("Valid.");
-				}
-
-			}
-			return e;
 		}
-
-		[Benchmark]
-		public Greek EnumValueParse()
+		else
 		{
-			Greek e = Greek.None;
-			if (UseValid)
+			foreach (string s in InvalidValues)
 			{
-				foreach (string s in ValidValues)
-				{
-					if (!EnumValue.TryParse(s, IgnoreCase, out e))
-						throw new Exception("Invalid.");
-				}
+				if (EnumValue.TryParse(s, IgnoreCase, out e))
+					throw new Exception("Valid.");
 			}
-			else
-			{
-				foreach (string s in InvalidValues)
-				{
-					if (EnumValue.TryParse(s, IgnoreCase, out e))
-						throw new Exception("Valid.");
-				}
-
-			}
-			return e;
 		}
+		return e;
+	}
 
-
-		[Benchmark]
-		public Greek FastEnumParse()
+	[Benchmark]
+	public Greek FastEnumParse()
+	{
+		Greek e = Greek.None;
+		if (UseValid)
 		{
-			Greek e = Greek.None;
-			if (UseValid)
+			foreach (string s in ValidValues)
 			{
-				foreach (string s in ValidValues)
-				{
-					if (!FastEnum.TryParse(s, IgnoreCase, out e))
-						throw new Exception("Invalid.");
-				}
+				if (!FastEnum.TryParse(s, IgnoreCase, out e))
+					throw new Exception("Invalid.");
 			}
-			else
-			{
-				foreach (string s in InvalidValues)
-				{
-					if (FastEnum.TryParse(s, IgnoreCase, out e))
-						throw new Exception("Valid.");
-				}
-
-			}
-			return e;
 		}
+		else
+		{
+			foreach (string s in InvalidValues)
+			{
+				if (FastEnum.TryParse(s, IgnoreCase, out e))
+					throw new Exception("Valid.");
+			}
+		}
+		return e;
 	}
 }

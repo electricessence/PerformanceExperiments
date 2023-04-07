@@ -1,5 +1,4 @@
-﻿using System;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -9,7 +8,6 @@ public class ExampleData
 	public int Id { get; set; }
 	public string? Name { get; set; }
 }
-
 
 public class SymmetricEncryptionTests
 {
@@ -24,10 +22,10 @@ public class SymmetricEncryptionTests
 		var data = new ExampleData { Id = 123, Name = "John Doe" };
 
 		// Encrypt and serialize the data
-		var encryptedData = await aes.EncryptAsync(data);
+		using var encryptedData = await aes.EncryptAsync(data);
 
 		// Decrypt and deserialize the data
-		var decryptedData = await aes.DecryptAsync<ExampleData>(encryptedData);
+		var decryptedData = await aes.DecryptAsync<ExampleData>(encryptedData.Memory);
 
 		Assert.NotNull(encryptedData);
 		Assert.Equal(data.Id, decryptedData!.Id);

@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using Open.Collections;
 using Open.Diagnostics;
 
 namespace PerformanceExperiments;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
 public class DictionaryTests
 {
 	const int Size = 1000000;
@@ -54,8 +53,6 @@ public class DictionaryTests
 
 	[Benchmark]
 	public int SortedDictionaryRead() => ReadFromDictionary(SoDi);
-
-	
 
 	public static void TestAll()
 	{

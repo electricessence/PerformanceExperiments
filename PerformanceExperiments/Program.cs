@@ -16,4 +16,6 @@ using PerformanceExperiments;
 //BenchmarkRunner.Run<BinarySearchCrossover>();
 //BenchmarkRunner.Run<EnumToStringDTests>();
 //BenchmarkRunner.Run<XmlDocumentTraversalBenchmarks>();
-BenchmarkRunner.Run<XmlChildNodesBenchmark>();
+//BenchmarkRunner.Run<XmlChildNodesBenchmark>();
+//BenchmarkRunner.Run<DictionaryVsArray>();
+BenchmarkRunner.Run<HashCodeBenchmark>();
