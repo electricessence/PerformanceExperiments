@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -106,6 +107,17 @@ public static class XmlDocumentExtensions
 		}
 	}
 
+	public static void RemoveAllChildren(this XmlNode node)
+	{
+		XmlNode? childNode = node.LastChild;
+		while (childNode is not null)
+		{
+			var prev = childNode.PreviousSibling;
+			node.RemoveChild(childNode);
+			childNode = prev;
+		}
+	}
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static IEnumerable<XmlNode> GetChildrenAggressiveInlining(this XmlNode node)
 	{
@@ -114,6 +126,85 @@ public static class XmlDocumentExtensions
 		{
 			yield return childNode;
 			childNode = childNode.NextSibling;
+		}
+	}
+
+	public static void ImportContents(this XmlElement target, XmlElement source)
+	{
+		if (target is null)
+			throw new ArgumentNullException(nameof(target));
+
+		if (source is null)
+			throw new ArgumentNullException(nameof(source));
+
+		if (target.OwnerDocument is null)
+			throw new ArgumentException("Doesn't belong to an XmlDocument.", nameof(target));
+
+		CopyNodeContents(source, target);
+	}
+
+	public static void ReplaceContents(this XmlElement target, XmlElement source)
+	{
+		if (target is null)
+			throw new ArgumentNullException(nameof(target));
+
+		if (source is null)
+			throw new ArgumentNullException(nameof(source));
+
+		if (target.OwnerDocument is null)
+			throw new ArgumentException("Doesn't belong to an XmlDocument.", nameof(target));
+
+		target.RemoveAllChildren();
+		CopyNodeContents(source, target);
+	}
+
+	private static void CopyNodeContents(XmlNode sourceNode, XmlNode destNode)
+	{
+		XmlDocument destDoc = destNode.OwnerDocument!;
+
+		foreach (XmlNode childNode in sourceNode.GetChildren())
+		{
+			XmlNode? copiedNode = null;
+
+			switch (childNode)
+			{
+				case XmlElement sourceElement:
+					XmlElement destElement = destDoc.CreateElement(childNode.Prefix, childNode.LocalName, childNode.NamespaceURI);
+					foreach (XmlAttribute attr in sourceElement.Attributes)
+					{
+						XmlAttribute copiedAttr = destDoc.CreateAttribute(attr.Prefix, attr.LocalName, attr.NamespaceURI);
+						copiedAttr.Value = attr.Value;
+						destElement.Attributes.Append(copiedAttr);
+					}
+					copiedNode = destElement;
+					break;
+
+				case XmlText sourceText:
+					copiedNode = destDoc.CreateTextNode(sourceText.Value);
+					break;
+
+				case XmlComment sourceComment:
+					copiedNode = destDoc.CreateComment(sourceComment.Value);
+					break;
+
+				case XmlCDataSection sourceCData:
+					copiedNode = destDoc.CreateCDataSection(sourceCData.Value);
+					break;
+
+				case XmlProcessingInstruction sourcePI:
+					copiedNode = destDoc.CreateProcessingInstruction(sourcePI.Target, sourcePI.Data);
+					break;
+
+				case XmlEntityReference sourceEntityRef:
+					copiedNode = destDoc.CreateEntityReference(sourceEntityRef.Name);
+					break;
+			}
+
+			if (copiedNode is null)
+				continue;
+
+			destNode.AppendChild(copiedNode);
+			CopyNodeContents(childNode, copiedNode);
 		}
 	}
 }
@@ -356,4 +447,59 @@ public class XmlChildNodesBenchmark
 	//	}
 	//	return name;
 	//}
+}
+
+[MemoryDiagnoser]
+public class XmlCopyBenchmark
+{
+	private readonly XmlDocument sourceDoc;
+	private readonly XmlDocument destDoc;
+	private readonly XmlElement sourceNode;
+	private readonly XmlElement destNode;
+
+	public XmlCopyBenchmark()
+	{
+		sourceDoc = new XmlDocument();
+
+		const string sourceXml = @"
+            <root>
+                <item>
+                    <subitem attr='value'>
+                        <child attr1='val1' attr2='val2'>
+                            <grandchild>Text content</grandchild>
+                            <grandchild attr3='val3'>
+                                <greatgrandchild>More text</greatgrandchild>
+                            </grandchild>
+                        </child>
+                        <child>
+                            <grandchild>Another text node</grandchild>
+                        </child>
+                    </subitem>
+                    <subitem>
+                        <child>
+                            <grandchild>One more text node</grandchild>
+                        </child>
+                    </subitem>
+                </item>
+            </root>";
+		sourceDoc.LoadXml(sourceXml);
+		sourceNode = (XmlElement)sourceDoc.SelectSingleNode("/root/item")!;
+
+		destDoc = new XmlDocument();
+		const string destXml = "<root><newitem/></root>";
+		destDoc.LoadXml(destXml);
+		destNode = (XmlElement)destDoc.SelectSingleNode("/root/newitem")!;
+	}
+
+	[Benchmark]
+	public void ImportContents()
+	{
+		destNode.ReplaceContents(sourceNode);
+	}
+
+	[Benchmark(Baseline = true)]
+	public void InnerXml()
+	{
+		destNode.InnerXml = sourceNode.InnerXml;
+	}
 }
