@@ -5,11 +5,8 @@ namespace PerformanceExperiments.Tests;
 
 public class XmlElementExtensionsTests
 {
-	[Fact]
-	public void TestImportContents()
-	{
-		// Arrange
-		const string sourceXml = @"
+	// Arrange
+	const string sourceXml = @"
             <root>
                 <item a='x'>
                     <subitem attr='value'>
@@ -31,25 +28,57 @@ public class XmlElementExtensionsTests
                 </item>
             </root>";
 
-		const string destXml = "<root><newitem a='y'/></root>";
+	readonly XmlDocument sourceDoc;
+	readonly XmlElement sourceNode;
 
-		XmlDocument sourceDoc = new();
-		XmlDocument destDoc1 = new();
-		XmlDocument destDoc2 = new();
+	const string destXml = "<root><newitem a='y'/></root>";
+	readonly XmlDocument innerXmlDoc;
+	readonly XmlElement innerXmlNode;
 
+	public XmlElementExtensionsTests()
+	{
+		sourceDoc = new();
 		sourceDoc.LoadXml(sourceXml);
-		destDoc1.LoadXml(destXml);
-		destDoc2.LoadXml(destXml);
+		sourceNode = (XmlElement)sourceDoc.SelectSingleNode("/root/item")!;
 
-		XmlElement sourceNode = (XmlElement)sourceDoc.SelectSingleNode("/root/item")!;
-		XmlElement destNode1 = (XmlElement)destDoc1.SelectSingleNode("/root/newitem")!;
-		XmlElement destNode2 = (XmlElement)destDoc2.SelectSingleNode("/root/newitem")!;
+		innerXmlDoc = GetNewDestinationDoc();
+		innerXmlNode = GetNewDestinationNode(innerXmlDoc);
+		innerXmlNode.InnerXml = sourceNode.InnerXml;
+	}
+
+	static XmlDocument GetNewDestinationDoc()
+	{
+		XmlDocument destDoc = new();
+		destDoc.LoadXml(destXml);
+		return destDoc;
+	}
+
+	static XmlElement GetNewDestinationNode(XmlDocument destDoc)
+		=> (XmlElement)destDoc.SelectSingleNode("/root/newitem")!;
+
+	[Fact]
+	public void TestReplaceContents()
+	{
+		XmlDocument destDoc = GetNewDestinationDoc();
+		XmlElement destNode = GetNewDestinationNode(destDoc);
 
 		// Act
-		destNode1.ReplaceContents(sourceNode);
-		destNode2.InnerXml = sourceNode.InnerXml;
+		destNode.ReplaceContents(sourceNode);
 
 		// Assert
-		Assert.Equal(destDoc1.OuterXml, destDoc2.OuterXml);
+		Assert.Equal(innerXmlDoc.OuterXml, destDoc.OuterXml);
+	}
+
+	[Fact]
+	public void TestReplaceContentsNonRecursive()
+	{
+		XmlDocument destDoc = GetNewDestinationDoc();
+		XmlElement destNode = GetNewDestinationNode(destDoc);
+
+		// Act
+		destNode.ReplaceContentsNonRecursive(sourceNode);
+
+		// Assert
+		Assert.Equal(innerXmlDoc.OuterXml, destDoc.OuterXml);
 	}
 }

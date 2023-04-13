@@ -158,54 +158,111 @@ public static class XmlDocumentExtensions
 		CopyNodeContents(source, target);
 	}
 
+	private static void CopyAttributes(XmlElement sourceElement, XmlElement destElement)
+	{
+		foreach (XmlAttribute attr in sourceElement.Attributes)
+		{
+			XmlAttribute copiedAttr = destElement.OwnerDocument.CreateAttribute(attr.Prefix, attr.LocalName, attr.NamespaceURI);
+			copiedAttr.Value = attr.Value;
+			destElement.Attributes.Append(copiedAttr);
+		}
+	}
+
+	private static XmlNode CopyNode(XmlNode sourceNode, XmlDocument destDoc)
+	{
+		switch (sourceNode)
+		{
+			case XmlElement sourceElement:
+				XmlElement destElement = destDoc.CreateElement(sourceNode.Prefix, sourceNode.LocalName, sourceNode.NamespaceURI);
+				CopyAttributes(sourceElement, destElement);
+				return destElement;
+
+			case XmlText sourceText:
+				return destDoc.CreateTextNode(sourceText.Value);
+
+			case XmlComment sourceComment:
+				return destDoc.CreateComment(sourceComment.Value);
+
+			case XmlCDataSection sourceCData:
+				return destDoc.CreateCDataSection(sourceCData.Value);
+
+			case XmlProcessingInstruction sourcePI:
+				return destDoc.CreateProcessingInstruction(sourcePI.Target, sourcePI.Data);
+
+			case XmlEntityReference sourceEntityRef:
+				return destDoc.CreateEntityReference(sourceEntityRef.Name);
+
+			default:
+				return destDoc.CreateNode(sourceNode.NodeType, sourceNode.Name, sourceNode.NamespaceURI);
+		}
+	}
+
 	private static void CopyNodeContents(XmlNode sourceNode, XmlNode destNode)
 	{
 		XmlDocument destDoc = destNode.OwnerDocument!;
 
 		foreach (XmlNode childNode in sourceNode.GetChildren())
 		{
-			XmlNode? copiedNode = null;
-
-			switch (childNode)
-			{
-				case XmlElement sourceElement:
-					XmlElement destElement = destDoc.CreateElement(childNode.Prefix, childNode.LocalName, childNode.NamespaceURI);
-					foreach (XmlAttribute attr in sourceElement.Attributes)
-					{
-						XmlAttribute copiedAttr = destDoc.CreateAttribute(attr.Prefix, attr.LocalName, attr.NamespaceURI);
-						copiedAttr.Value = attr.Value;
-						destElement.Attributes.Append(copiedAttr);
-					}
-					copiedNode = destElement;
-					break;
-
-				case XmlText sourceText:
-					copiedNode = destDoc.CreateTextNode(sourceText.Value);
-					break;
-
-				case XmlComment sourceComment:
-					copiedNode = destDoc.CreateComment(sourceComment.Value);
-					break;
-
-				case XmlCDataSection sourceCData:
-					copiedNode = destDoc.CreateCDataSection(sourceCData.Value);
-					break;
-
-				case XmlProcessingInstruction sourcePI:
-					copiedNode = destDoc.CreateProcessingInstruction(sourcePI.Target, sourcePI.Data);
-					break;
-
-				case XmlEntityReference sourceEntityRef:
-					copiedNode = destDoc.CreateEntityReference(sourceEntityRef.Name);
-					break;
-			}
-
-			if (copiedNode is null)
-				continue;
-
+			XmlNode copiedNode = CopyNode(childNode, destDoc);
 			destNode.AppendChild(copiedNode);
 			CopyNodeContents(childNode, copiedNode);
 		}
+	}
+
+	public static void ReplaceContentsNonRecursive(this XmlElement target, XmlElement source)
+	{
+		if (target is null)
+			throw new ArgumentNullException(nameof(target));
+
+		if (source is null)
+			throw new ArgumentNullException(nameof(source));
+
+		if (target.OwnerDocument is null)
+			throw new ArgumentException("Doesn't belong to an XmlDocument.", nameof(target));
+
+		target.RemoveAllChildren();
+		CopyNodeContentsNonRecursive(source, target);
+	}
+
+	private static void CopyNodeContentsNonRecursive(XmlNode sourceNode, XmlNode destNode)
+	{
+		XmlNode? current = sourceNode.FirstChild;
+		if (current is null) return;
+		XmlDocument destDoc = destNode.OwnerDocument!;
+		XmlNode? currentDestParent = destNode;
+
+	start:
+		var currentCopy = CopyNode(current, destDoc);
+		currentDestParent.AppendChild(currentCopy);
+
+		var next = current.FirstChild;
+		if(next is not null)
+		{
+			current = next;
+			currentDestParent = currentCopy;
+			goto start;
+		}
+
+		next = current.NextSibling;
+		if(next is not null)
+		{
+			current = next;
+			goto start;
+		}
+
+	findNext:
+		var parent = current.ParentNode!;
+		if (parent == sourceNode) return;
+		currentDestParent = currentDestParent.ParentNode!;
+		next = parent.NextSibling;
+		if(next is null)
+		{
+			current = parent;
+			goto findNext;
+		}
+
+		current = next;
+		goto start;
 	}
 }
 
@@ -449,6 +506,14 @@ public class XmlChildNodesBenchmark
 	//}
 }
 
+/*
+|                      Method |     Mean |     Error |    StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
+|---------------------------- |---------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
+|                    InnerXml | 5.806 us | 0.1098 us | 0.1221 us |  1.00 |    0.00 | 3.6621 |   7.48 KB |        1.00 |
+|             ReplaceContents | 3.917 us | 0.0432 us | 0.0361 us |  0.67 |    0.01 | 1.0300 |   2.12 KB |        0.28 |
+| ReplaceContentsNonRecursive | 3.350 us | 0.0573 us | 0.0508 us |  0.57 |    0.02 | 0.6332 |    1.3 KB |        0.17 |
+*/
+
 [MemoryDiagnoser]
 public class XmlCopyBenchmark
 {
@@ -491,15 +556,22 @@ public class XmlCopyBenchmark
 		destNode = (XmlElement)destDoc.SelectSingleNode("/root/newitem")!;
 	}
 
-	[Benchmark]
-	public void ImportContents()
-	{
-		destNode.ReplaceContents(sourceNode);
-	}
-
 	[Benchmark(Baseline = true)]
 	public void InnerXml()
 	{
 		destNode.InnerXml = sourceNode.InnerXml;
 	}
+
+	[Benchmark]
+	public void ReplaceContents()
+	{
+		destNode.ReplaceContents(sourceNode);
+	}
+
+	[Benchmark]
+	public void ReplaceContentsNonRecursive()
+	{
+		destNode.ReplaceContentsNonRecursive(sourceNode);
+	}
+
 }
