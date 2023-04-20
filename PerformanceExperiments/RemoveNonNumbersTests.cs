@@ -57,7 +57,7 @@ internal static class RemoveNonNumbersMethods
 			}
 		}
 		if (newLen == 0) return string.Empty;
-		return len == input.Length ? input : new string(a[..newLen]);
+		return len == input.Length ? input : a.Slice(0, newLen).ToString();
 	}
 }
 
