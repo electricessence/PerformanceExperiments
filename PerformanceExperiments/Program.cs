@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Running;
 using PerformanceExperiments;
+using System;
 
 //BenchmarkRunner.Run<ArrayTests>();
 //BenchmarkRunner.Run<HasDigitBenchmarks>();
