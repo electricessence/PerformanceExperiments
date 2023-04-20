@@ -506,12 +506,20 @@ public class XmlChildNodesBenchmark
 	//}
 }
 
-/*
+/* Small XML
 |                      Method |     Mean |     Error |    StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
 |---------------------------- |---------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
 |                    InnerXml | 5.806 us | 0.1098 us | 0.1221 us |  1.00 |    0.00 | 3.6621 |   7.48 KB |        1.00 |
 |             ReplaceContents | 3.917 us | 0.0432 us | 0.0361 us |  0.67 |    0.01 | 1.0300 |   2.12 KB |        0.28 |
 | ReplaceContentsNonRecursive | 3.350 us | 0.0573 us | 0.0508 us |  0.57 |    0.02 | 0.6332 |    1.3 KB |        0.17 |
+*/
+
+/* Large XML
+|                      Method |     Mean |     Error |    StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
+|---------------------------- |---------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
+|                    InnerXml | 9.365 us | 0.1870 us | 0.2365 us |  1.00 |    0.00 | 4.5471 |   9.29 KB |        1.00 |
+|             ReplaceContents | 7.069 us | 0.1303 us | 0.1218 us |  0.75 |    0.02 | 1.8387 |   3.76 KB |        0.40 |
+| ReplaceContentsNonRecursive | 6.250 us | 0.1130 us | 0.1387 us |  0.67 |    0.02 | 1.3046 |   2.66 KB |        0.29 |
 */
 
 [MemoryDiagnoser]
@@ -526,34 +534,86 @@ public class XmlCopyBenchmark
 	{
 		sourceDoc = new XmlDocument();
 
-		const string sourceXml = @"
-            <root>
-                <item>
-                    <subitem attr='value'>
-                        <child attr1='val1' attr2='val2'>
-                            <grandchild>Text content</grandchild>
-                            <grandchild attr3='val3'>
-                                <greatgrandchild>More text</greatgrandchild>
-                            </grandchild>
-                        </child>
-                        <child>
-                            <grandchild>Another text node</grandchild>
-                        </child>
-                    </subitem>
-                    <subitem>
-                        <child>
-                            <grandchild>One more text node</grandchild>
-                        </child>
-                    </subitem>
-                </item>
-            </root>";
+		const string sourceXml = """
+		<root>
+		  <items>
+		    <item id="1">
+		      <properties>
+		        <property key="name">Item 1</property>
+		        <property key="description">This is the first item</property>
+		        <property key="color">Red</property>
+		        <property key="size">Medium</property>
+		      </properties>
+		      <categories>
+		        <category id="A">
+		          <subcategory id="A1">
+		            <subsubcategory id="A1a"/>
+		            <subsubcategory id="A1b"/>
+		            <subsubcategory id="A1c"/>
+		          </subcategory>
+		          <subcategory id="A2"/>
+		          <subcategory id="A3"/>
+		        </category>
+		        <category id="B"/>
+		      </categories>
+		      <relatedItems>
+		        <itemRef id="2"/>
+		        <itemRef id="3"/>
+		      </relatedItems>
+		    </item>
+		    <item id="2">
+		      <properties>
+		        <property key="name">Item 2</property>
+		        <property key="description">This is the second item</property>
+		        <property key="color">Blue</property>
+		        <property key="size">Large</property>
+		      </properties>
+		      <categories>
+		        <category id="A">
+		          <subcategory id="A1">
+		            <subsubcategory id="A1a"/>
+		            <subsubcategory id="A1b"/>
+		          </subcategory>
+		          <subcategory id="A2"/>
+		        </category>
+		        <category id="C"/>
+		      </categories>
+		      <relatedItems>
+		        <itemRef id="1"/>
+		        <itemRef id="3"/>
+		      </relatedItems>
+		    </item>
+			<item id="new"/>
+		    <item id="3">
+		      <properties>
+		        <property key="name">Item 3</property>
+		        <property key="description">This is the third item</property>
+		        <property key="color">Green</property>
+		        <property key="size">Small</property>
+		      </properties>
+		      <categories>
+		        <category id="B">
+		          <subcategory id="B1">
+		            <subsubcategory id="B1a"/>
+		          </subcategory>
+		          <subcategory id="B2"/>
+		        </category>
+		        <category id="C"/>
+		      </categories>
+		      <relatedItems>
+		        <itemRef id="1"/>
+		        <itemRef id="2"/>
+		      </relatedItems>
+		    </item>
+		  </items>
+		</root>
+		""";
 		sourceDoc.LoadXml(sourceXml);
-		sourceNode = (XmlElement)sourceDoc.SelectSingleNode("/root/item")!;
+		sourceNode = (XmlElement)sourceDoc.SelectSingleNode("/root/items/item[@id='2']")!;
 
 		destDoc = new XmlDocument();
-		const string destXml = "<root><newitem/></root>";
-		destDoc.LoadXml(destXml);
-		destNode = (XmlElement)destDoc.SelectSingleNode("/root/newitem")!;
+		destDoc.LoadXml(sourceXml);
+		destNode = (XmlElement)destDoc.SelectSingleNode("/root/items/item[@id='new']")!;
 	}
 
 	[Benchmark(Baseline = true)]
