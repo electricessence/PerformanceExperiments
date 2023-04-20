@@ -19,4 +19,5 @@ using PerformanceExperiments;
 //BenchmarkRunner.Run<XmlChildNodesBenchmark>();
 //BenchmarkRunner.Run<DictionaryVsArray>();
 //BenchmarkRunner.Run<HashCodeBenchmark>();
-BenchmarkRunner.Run<XmlCopyBenchmark>();
+//BenchmarkRunner.Run<XmlCopyBenchmark>();
+BenchmarkRunner.Run<RemoveNonNumbersTests>();
