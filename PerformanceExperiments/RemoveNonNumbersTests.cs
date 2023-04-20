@@ -7,11 +7,11 @@ using System;
 namespace PerformanceExperiments;
 
 /*
-|                            Method |     Mean |    Error |   StdDev | Ratio |   Gen0 | Allocated | Alloc Ratio |
-|---------------------------------- |---------:|---------:|---------:|------:|-------:|----------:|------------:|
-|                  RemoveNonNumbers | 891.9 ns | 17.81 ns | 36.38 ns |  1.00 | 0.5579 |    1168 B |        1.00 |
-| RemoveNonNumbersWithStringBuilder | 152.2 ns |  2.80 ns |  3.22 ns |  0.17 | 0.3135 |     656 B |        0.56 |
-|          RemoveNonNumbersWithSpan | 106.2 ns |  0.22 ns |  0.17 ns |  0.12 |      - |         - |        0.00 |
+|                            Method |     Mean |    Error |   StdDev |   Median | Ratio |   Gen0 | Allocated | Alloc Ratio |
+|---------------------------------- |---------:|---------:|---------:|---------:|------:|-------:|----------:|------------:|
+|                  RemoveNonNumbers | 897.9 ns | 17.53 ns | 30.23 ns | 900.5 ns |  1.00 | 0.5579 |    1168 B |        1.00 |
+| RemoveNonNumbersWithStringBuilder | 152.1 ns |  2.88 ns |  5.75 ns | 149.3 ns |  0.17 | 0.3135 |     656 B |        0.56 |
+|          RemoveNonNumbersWithSpan | 136.3 ns |  0.21 ns |  0.19 ns | 136.3 ns |  0.15 | 0.0648 |     136 B |        0.12 |
 */
 
 internal static class RemoveNonNumbersMethods
