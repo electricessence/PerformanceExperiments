@@ -1,11 +1,14 @@
 ﻿using BenchmarkDotNet.Attributes;
+using CommunityToolkit.HighPerformance.Buffers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.XPath;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PerformanceExperiments;
 
@@ -19,6 +22,96 @@ namespace PerformanceExperiments;
 
 public static class XmlDocumentExtensions
 {
+	public class InterningXmlReader : XmlReader
+	{
+		private readonly XmlReader _innerReader;
+		private readonly StringPool _stringPool;
+
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+			if(disposing) _innerReader.Dispose();
+		}
+
+		public InterningXmlReader(XmlReader innerReader, StringPool stringPool)
+		{
+			_innerReader = innerReader ?? throw new ArgumentNullException(nameof(innerReader));
+			_stringPool = stringPool ?? throw new ArgumentNullException(nameof(stringPool));
+		}
+
+		public override string Value => _stringPool.GetOrAdd(_innerReader.Value);
+
+		public override int AttributeCount => _innerReader.AttributeCount;
+
+		public override string BaseURI => _innerReader.BaseURI;
+
+		public override int Depth => _innerReader.Depth;
+
+		public override bool EOF => _innerReader.EOF;
+
+		public override bool IsEmptyElement => _innerReader.IsEmptyElement;
+
+		public override string LocalName => _innerReader.LocalName;
+
+		public override string NamespaceURI => _innerReader.NamespaceURI;
+
+		public override XmlNameTable NameTable => _innerReader.NameTable;
+
+		public override XmlNodeType NodeType => _innerReader.NodeType;
+
+		public override string Prefix => _innerReader.Prefix;
+
+		public override ReadState ReadState => _innerReader.ReadState;
+
+		public override string GetAttribute(int i) => _stringPool.GetOrAdd(_innerReader.GetAttribute(i));
+
+		public override string? GetAttribute(string name)
+		{
+			var value = _innerReader.GetAttribute(name);
+			if (value is null) return null;
+			return _stringPool.GetOrAdd(value);
+		}
+
+		public override string? GetAttribute(string name, string? namespaceURI) => _innerReader.GetAttribute(name, namespaceURI);
+
+		public override string? LookupNamespace(string prefix) => _innerReader.LookupNamespace(prefix);
+
+		public override bool MoveToAttribute(string name) => _innerReader.MoveToAttribute(name);
+
+		public override bool MoveToAttribute(string name, string? ns) => _innerReader.MoveToAttribute(name, ns);
+
+		public override bool MoveToElement() => _innerReader.MoveToElement();
+
+		public override bool MoveToFirstAttribute() => _innerReader.MoveToFirstAttribute();
+
+		public override bool MoveToNextAttribute() => _innerReader.MoveToNextAttribute();
+
+		public override bool Read() => _innerReader.Read();
+
+		public override bool ReadAttributeValue() => _innerReader.ReadAttributeValue();
+
+		public override void ResolveEntity() => _innerReader.ResolveEntity();
+
+		// Override all other XmlReader methods and properties to call the corresponding
+		// methods and properties on the wrapped XmlReader.
+		// ...
+	}
+	public static void LoadXmlWithPooling(this XmlDocument xmlDoc, string xmlContent, bool sharedPool = false)
+	{
+		if (xmlDoc == null)
+			throw new ArgumentNullException(nameof(xmlDoc));
+		if (xmlContent == null)
+			throw new ArgumentNullException(nameof(xmlContent));
+
+		var settings = new XmlReaderSettings { NameTable = xmlDoc.NameTable };
+
+		using var reader = new InterningXmlReader(
+			XmlReader.Create(new StringReader(xmlContent), settings),
+			sharedPool ? StringPool.Shared :new());
+
+		xmlDoc.Load(reader);
+	}
+
 	public static IEnumerable<XmlNode> GetDescendants(this XmlNode node, bool includeSelf = false)
 	{
 		if (includeSelf) yield return node;
@@ -530,108 +623,128 @@ public class XmlCopyBenchmark
 	private readonly XmlElement sourceNode;
 	private readonly XmlElement destNode;
 
+	public const string SourceXml = """
+	<root>
+		<items>
+		<item id="1">
+		    <properties>
+		    <property key="name">Item 1</property>
+		    <property key="description">This is the first item</property>
+		    <property key="color">Red</property>
+		    <property key="size">Medium</property>
+		    </properties>
+		    <categories>
+		    <category id="A">
+		        <subcategory id="A1">
+		        <subsubcategory id="A1a"/>
+		        <subsubcategory id="A1b"/>
+		        <subsubcategory id="A1c"/>
+		        </subcategory>
+		        <subcategory id="A2"/>
+		        <subcategory id="A3"/>
+		    </category>
+		    <category id="B"/>
+		    </categories>
+		    <relatedItems>
+		    <itemRef id="2"/>
+		    <itemRef id="3"/>
+		    </relatedItems>
+		</item>
+		<item id="2">
+		    <properties>
+		    <property key="name">Item 2</property>
+		    <property key="description">This is the second item</property>
+		    <property key="color">Blue</property>
+		    <property key="size">Large</property>
+		    </properties>
+		    <categories>
+		    <category id="A">
+		        <subcategory id="A1">
+		        <subsubcategory id="A1a"/>
+		        <subsubcategory id="A1b"/>
+		        </subcategory>
+		        <subcategory id="A2"/>
+		    </category>
+		    <category id="C"/>
+		    </categories>
+		    <relatedItems>
+		    <itemRef id="1"/>
+		    <itemRef id="3"/>
+		    </relatedItems>
+		</item>
+		<item id="new"/>
+		<item id="3">
+		    <properties>
+		    <property key="name">Item 3</property>
+		    <property key="description">This is the third item</property>
+		    <property key="color">Green</property>
+		    <property key="size">Small</property>
+		    </properties>
+		    <categories>
+		    <category id="B">
+		        <subcategory id="B1">
+		        <subsubcategory id="B1a"/>
+		        </subcategory>
+		        <subcategory id="B2"/>
+		    </category>
+		    <category id="C"/>
+		    </categories>
+		    <relatedItems>
+		    <itemRef id="1"/>
+		    <itemRef id="2"/>
+		    </relatedItems>
+		</item>
+		</items>
+	</root>
+	""";
+
 	public XmlCopyBenchmark()
 	{
 		sourceDoc = new XmlDocument();
 
-		const string sourceXml = """
-		<root>
-		  <items>
-		    <item id="1">
-		      <properties>
-		        <property key="name">Item 1</property>
-		        <property key="description">This is the first item</property>
-		        <property key="color">Red</property>
-		        <property key="size">Medium</property>
-		      </properties>
-		      <categories>
-		        <category id="A">
-		          <subcategory id="A1">
-		            <subsubcategory id="A1a"/>
-		            <subsubcategory id="A1b"/>
-		            <subsubcategory id="A1c"/>
-		          </subcategory>
-		          <subcategory id="A2"/>
-		          <subcategory id="A3"/>
-		        </category>
-		        <category id="B"/>
-		      </categories>
-		      <relatedItems>
-		        <itemRef id="2"/>
-		        <itemRef id="3"/>
-		      </relatedItems>
-		    </item>
-		    <item id="2">
-		      <properties>
-		        <property key="name">Item 2</property>
-		        <property key="description">This is the second item</property>
-		        <property key="color">Blue</property>
-		        <property key="size">Large</property>
-		      </properties>
-		      <categories>
-		        <category id="A">
-		          <subcategory id="A1">
-		            <subsubcategory id="A1a"/>
-		            <subsubcategory id="A1b"/>
-		          </subcategory>
-		          <subcategory id="A2"/>
-		        </category>
-		        <category id="C"/>
-		      </categories>
-		      <relatedItems>
-		        <itemRef id="1"/>
-		        <itemRef id="3"/>
-		      </relatedItems>
-		    </item>
-			<item id="new"/>
-		    <item id="3">
-		      <properties>
-		        <property key="name">Item 3</property>
-		        <property key="description">This is the third item</property>
-		        <property key="color">Green</property>
-		        <property key="size">Small</property>
-		      </properties>
-		      <categories>
-		        <category id="B">
-		          <subcategory id="B1">
-		            <subsubcategory id="B1a"/>
-		          </subcategory>
-		          <subcategory id="B2"/>
-		        </category>
-		        <category id="C"/>
-		      </categories>
-		      <relatedItems>
-		        <itemRef id="1"/>
-		        <itemRef id="2"/>
-		      </relatedItems>
-		    </item>
-		  </items>
-		</root>
-		""";
-		sourceDoc.LoadXml(sourceXml);
+		
+		sourceDoc.LoadXml(SourceXml);
 		sourceNode = (XmlElement)sourceDoc.SelectSingleNode("/root/items/item[@id='2']")!;
 
 		destDoc = new XmlDocument();
-		destDoc.LoadXml(sourceXml);
+		destDoc.LoadXml(SourceXml);
 		destNode = (XmlElement)destDoc.SelectSingleNode("/root/items/item[@id='new']")!;
 	}
 
 	[Benchmark(Baseline = true)]
-	public void InnerXml()
+	public void InnerXml() => destNode.InnerXml = sourceNode.InnerXml;
+
+	[Benchmark]
+	public void ReplaceContents() => destNode.ReplaceContents(sourceNode);
+
+	[Benchmark]
+	public void ReplaceContentsNonRecursive() => destNode.ReplaceContentsNonRecursive(sourceNode);
+
+}
+
+[MemoryDiagnoser]
+[SuppressMessage("Performance", "CA1822:Mark members as static")]
+public class XmlLoadBenchmark
+{
+
+	[Benchmark(Baseline = true)]
+	public void LoadXml()
 	{
-		destNode.InnerXml = sourceNode.InnerXml;
+		var xmlDoc = new XmlDocument();
+		xmlDoc.LoadXml(XmlCopyBenchmark.SourceXml);
 	}
 
 	[Benchmark]
-	public void ReplaceContents()
+	public void LoadXmlWithPooling()
 	{
-		destNode.ReplaceContents(sourceNode);
+		var xmlDoc = new XmlDocument();
+		xmlDoc.LoadXmlWithPooling(XmlCopyBenchmark.SourceXml);
 	}
 
 	[Benchmark]
-	public void ReplaceContentsNonRecursive()
+	public void LoadXmlWithPoolingShared()
 	{
-		destNode.ReplaceContentsNonRecursive(sourceNode);
+		var xmlDoc = new XmlDocument();
+		xmlDoc.LoadXmlWithPooling(XmlCopyBenchmark.SourceXml, true);
 	}
-
 }
