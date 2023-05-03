@@ -29,16 +29,16 @@ public static class HasDigitExtensions
 public class HasDigitBenchmarks
 {
 	static readonly int[] Values = new int[] { 123456789, 987654321, 999991111 };
-	static readonly string[] ValueStrings = Values.Select(v=>v.ToString()).ToArray();
+	static readonly string[] ValueStrings = Values.Select(v => v.ToString()).ToArray();
 	static readonly int[] Digits = new int[] { 2, 3, 5, 7, 8 };
 	static readonly char[] CDigits = Digits.Select(d => d.ToString()[0]).ToArray();
 
 	[Benchmark(Baseline = true)]
 	public void HasDigitFromString()
 	{
-		foreach(var value in Values)
+		foreach (var value in Values)
 		{
-			foreach(var digit in CDigits)
+			foreach (var digit in CDigits)
 			{
 				_ = value.HasDigitFromString(digit);
 			}

@@ -26,7 +26,7 @@ public class EnumParseTests
 	public Greek EnumParse()
 	{
 		Greek e = Greek.None;
-		if(UseValid)
+		if (UseValid)
 		{
 			foreach (string s in ValidValues)
 			{

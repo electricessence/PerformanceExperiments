@@ -17,7 +17,7 @@ public class SymmetricEncryptionTests
 		var aes = Aes.Create();
 		aes.GenerateKey();
 		aes.GenerateIV();
-		aes.Mode= CipherMode.CBC;
+		aes.Mode = CipherMode.CBC;
 
 		var data = new ExampleData { Id = 123, Name = "John Doe" };
 

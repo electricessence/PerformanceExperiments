@@ -1,8 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
-using System.Diagnostics.CodeAnalysis;
-using System;
 
 namespace PerformanceExperiments;
 

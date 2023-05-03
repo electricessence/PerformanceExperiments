@@ -13,7 +13,7 @@ public class EnumToStringDTests
 	public string IntToString()
 	{
 		var s = "";
-		foreach(var e in Values)
+		foreach (var e in Values)
 		{
 			var i = (int)e;
 			s = i.ToString();

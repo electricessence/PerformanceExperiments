@@ -16,7 +16,7 @@ public class StringEqualsTests
 		if (b is null) return false;
 
 		var len = a.Length;
-		if(len != b.Length) return false;
+		if (len != b.Length) return false;
 		return len switch
 		{
 			0 => true,

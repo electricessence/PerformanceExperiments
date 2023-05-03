@@ -1,8 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace PerformanceExperiments;
 
@@ -20,7 +20,7 @@ public class ArrayTests
 	public int ArrayRead()
 	{
 		int x = -1;
-		for(var i = 0; i < Size; i++)
+		for (var i = 0; i < Size; i++)
 		{
 			x = Values[i];
 		}
@@ -67,7 +67,7 @@ public class ArrayTests
 		var x = ValuesImmutable.ItemRef(0);
 		for (var i = 1; i < Size; i++)
 		{
-			 x = ValuesImmutable.ItemRef(i);
+			x = ValuesImmutable.ItemRef(i);
 		}
 		return x;
 	}

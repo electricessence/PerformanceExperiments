@@ -10,7 +10,7 @@ public class TypeofVsIs
 	public double Is()
 	{
 		var result = double.NaN;
-		for(int i = 0; i < Iterations; i++)
+		for (int i = 0; i < Iterations; i++)
 		{
 			double d = i;
 			if (!IsDouble(i)
@@ -40,5 +40,5 @@ public class TypeofVsIs
 		=> value is double;
 
 	static bool TypeOfDouble<T>(T value)
-		=> typeof(T)==typeof(double);
+		=> typeof(T) == typeof(double);
 }

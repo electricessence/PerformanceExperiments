@@ -1,10 +1,10 @@
-﻿using System;
+﻿using BenchmarkDotNet.Attributes;
+using Open.Collections;
+using Open.Diagnostics;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using BenchmarkDotNet.Attributes;
-using Open.Collections;
-using Open.Diagnostics;
 
 namespace PerformanceExperiments;
 
@@ -18,7 +18,7 @@ public class DictionaryTests
 	static readonly int[] KeyOrder = Keys.Shuffle().ToArray();
 
 	static readonly Dictionary<int, int> Di
-		= Keys.ToDictionary(k=>k, k => Random.Shared.Next(Size));
+		= Keys.ToDictionary(k => k, k => Random.Shared.Next(Size));
 
 	static readonly ImmutableDictionary<int, int> ImDi
 		= Di.ToImmutableDictionary();

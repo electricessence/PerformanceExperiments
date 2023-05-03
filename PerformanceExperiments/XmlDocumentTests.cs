@@ -3,12 +3,12 @@ using CommunityToolkit.HighPerformance.Buffers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.XPath;
-using System.Diagnostics.CodeAnalysis;
 
 namespace PerformanceExperiments;
 
@@ -30,7 +30,7 @@ public static class XmlDocumentExtensions
 		protected override void Dispose(bool disposing)
 		{
 			base.Dispose(disposing);
-			if(disposing) _innerReader.Dispose();
+			if (disposing) _innerReader.Dispose();
 		}
 
 		public InterningXmlReader(XmlReader innerReader, StringPool stringPool)
@@ -91,11 +91,8 @@ public static class XmlDocumentExtensions
 		public override bool ReadAttributeValue() => _innerReader.ReadAttributeValue();
 
 		public override void ResolveEntity() => _innerReader.ResolveEntity();
-
-		// Override all other XmlReader methods and properties to call the corresponding
-		// methods and properties on the wrapped XmlReader.
-		// ...
 	}
+
 	public static void LoadXmlWithPooling(this XmlDocument xmlDoc, string xmlContent, bool sharedPool = false)
 	{
 		if (xmlDoc == null)
@@ -107,7 +104,7 @@ public static class XmlDocumentExtensions
 
 		using var reader = new InterningXmlReader(
 			XmlReader.Create(new StringReader(xmlContent), settings),
-			sharedPool ? StringPool.Shared :new());
+			sharedPool ? StringPool.Shared : new());
 
 		xmlDoc.Load(reader);
 	}
@@ -117,20 +114,20 @@ public static class XmlDocumentExtensions
 		if (includeSelf) yield return node;
 
 		XmlNode? current = node.FirstChild;
-		if(current is null) yield break;
+		if (current is null) yield break;
 
-	start: // Using a label to avoid unnecessary while condition check.
+		start: // Using a label to avoid unnecessary while condition check.
 		yield return current;
 
 		var next = current.FirstChild ?? current.NextSibling;
-		if(next is null)
+		if (next is null)
 		{
 		findNext: // Again, using a label avoids an unnecessary null check.
 			var parent = current!.ParentNode!;
 			// 'parent' should never be null as we should have come full circle.
 			// Unless the tree was modified, but that would cause more than just a null reference problem.
 			Debug.Assert(parent is not null);
-			if(parent == node)
+			if (parent == node)
 				yield break;
 
 			next = parent.NextSibling;
@@ -329,7 +326,7 @@ public static class XmlDocumentExtensions
 		currentDestParent.AppendChild(currentCopy);
 
 		var next = current.FirstChild;
-		if(next is not null)
+		if (next is not null)
 		{
 			current = next;
 			currentDestParent = currentCopy;
@@ -337,7 +334,7 @@ public static class XmlDocumentExtensions
 		}
 
 		next = current.NextSibling;
-		if(next is not null)
+		if (next is not null)
 		{
 			current = next;
 			goto start;
@@ -348,7 +345,7 @@ public static class XmlDocumentExtensions
 		if (parent == sourceNode) return;
 		currentDestParent = currentDestParent.ParentNode!;
 		next = parent.NextSibling;
-		if(next is null)
+		if (next is null)
 		{
 			current = parent;
 			goto findNext;
@@ -702,7 +699,7 @@ public class XmlCopyBenchmark
 	{
 		sourceDoc = new XmlDocument();
 
-		
+
 		sourceDoc.LoadXml(SourceXml);
 		sourceNode = (XmlElement)sourceDoc.SelectSingleNode("/root/items/item[@id='2']")!;
 

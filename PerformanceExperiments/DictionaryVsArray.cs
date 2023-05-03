@@ -1,7 +1,7 @@
-﻿using System;
+﻿using BenchmarkDotNet.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using BenchmarkDotNet.Attributes;
 
 namespace PerformanceExperiments;
 
@@ -110,7 +110,7 @@ public class DictionaryVsArray
 
 		foreach (var key in _keys.AsSpan())
 		{
-			if(TryBinarySearch(arraySpan, key, out var value))
+			if (TryBinarySearch(arraySpan, key, out var value))
 				result += value;
 		}
 		return result;
@@ -133,7 +133,7 @@ public class DictionaryVsArray
 			var comparison = middleKey.CompareTo(key);
 			if (comparison < 0)
 				left = middle + 1;
-			else if(comparison > 0)
+			else if (comparison > 0)
 				right = middle - 1;
 			else
 				return middle;

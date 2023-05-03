@@ -37,7 +37,7 @@ public class StringTests
 	}
 
 	[Theory]
-	[InlineData("a","A")]
+	[InlineData("a", "A")]
 	[InlineData("a", null)]
 	public void InequalityTest(string a, string? b, StringComparison sc = StringComparison.Ordinal)
 	{

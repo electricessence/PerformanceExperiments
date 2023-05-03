@@ -83,7 +83,7 @@ public static class CharArrayExtensions
 	{
 		int hash_value = 0;
 		int length = chars.Length;
-		for(var i = 0; i < length; i++)
+		for (var i = 0; i < length; i++)
 		{
 			ref readonly char c = ref chars[i];
 			hash_value = (hash_value * 31) ^ c;
