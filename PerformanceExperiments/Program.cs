@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Running;
 using PerformanceExperiments;
+using System;
 
 //BenchmarkRunner.Run<ArrayTests>();
 //BenchmarkRunner.Run<HasDigitBenchmarks>();
@@ -21,4 +22,11 @@ using PerformanceExperiments;
 //BenchmarkRunner.Run<HashCodeBenchmark>();
 //BenchmarkRunner.Run<XmlCopyBenchmark>();
 //BenchmarkRunner.Run<RemoveNonNumbersTests>();
-BenchmarkRunner.Run<XmlLoadBenchmark>();
+//BenchmarkRunner.Run<XmlLoadBenchmark>();
+
+
+//Console.WriteLine($"GetHashCodeFromChars 100 collision rate: {HashCollisionTest.Test(s => CharArrayExtensions.GetHashCodeFromChars(s.AsSpan()), 1000000, 100) * 100}%");
+//Console.WriteLine($"GetHashCodeFromCharsFNV1a 100 collision rate: {HashCollisionTest.Test(s => CharArrayExtensions.GetHashCodeFromCharsFNV1a(s.AsSpan()), 1000000, 100) * 100}%");
+
+//Console.WriteLine($"GetHashCodeFromChars 1000 collision rate: {HashCollisionTest.Test(s => CharArrayExtensions.GetHashCodeFromChars(s.AsSpan()), 1000000, 1000) * 100}%");
+//Console.WriteLine($"GetHashCodeFromCharsFNV1a 1000 collision rate: {HashCollisionTest.Test(s => CharArrayExtensions.GetHashCodeFromCharsFNV1a(s.AsSpan()), 1000000, 1000) * 100}%");
