@@ -2,7 +2,7 @@
 using PerformanceExperiments;
 using System;
 
-//BenchmarkRunner.Run<ArrayTests>();
+BenchmarkRunner.Run<ArrayTests>();
 //BenchmarkRunner.Run<HasDigitBenchmarks>();
 //BenchmarkRunner.Run<StringTests>();
 //BenchmarkRunner.Run<SpanTests>();
@@ -23,6 +23,7 @@ using System;
 //BenchmarkRunner.Run<XmlCopyBenchmark>();
 //BenchmarkRunner.Run<RemoveNonNumbersTests>();
 //BenchmarkRunner.Run<XmlLoadBenchmark>();
+//BenchmarkRunner.Run<LookupExpresssionTests>();
 
 
 //Console.WriteLine($"GetHashCodeFromChars 100 collision rate: {HashCollisionTest.Test(s => CharArrayExtensions.GetHashCodeFromChars(s.AsSpan()), 1000000, 100) * 100}%");
