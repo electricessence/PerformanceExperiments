@@ -2,7 +2,8 @@
 using PerformanceExperiments;
 using System;
 
-BenchmarkRunner.Run<ArrayTests>();
+BenchmarkRunner.Run(new[] { typeof(ByValueVsByRef.IntBenchmark), typeof(ByValueVsByRef.CharBenchmark), typeof(ByValueVsByRef.ShortBenchmark), typeof(ByValueVsByRef.DecimalBenchmark) });
+//BenchmarkRunner.Run<ArrayTests>();
 //BenchmarkRunner.Run<HasDigitBenchmarks>();
 //BenchmarkRunner.Run<StringTests>();
 //BenchmarkRunner.Run<SpanTests>();
